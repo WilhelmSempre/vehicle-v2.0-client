@@ -1,0 +1,14 @@
+os: [
+  linux
+]
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+allow_failures:
+  - php: hhvm
+language: php
+php:
+  - "7.2"
+  - "7.3"
+before_script: composer install
+script: phpunit
