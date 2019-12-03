@@ -12,3 +12,4 @@ symfony.lock
 logs/
 var/cache
 var/log
+phpunit.xml.dist
