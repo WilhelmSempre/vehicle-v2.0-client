@@ -25,3 +25,21 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    vehicle.profiler.api.collector:
+        class: App\DataCollector\ApiCollector
+        arguments:
+            - '@vehicle.api.service'
+        tags:
+            - { name: data_collector, template: 'Profiler/api.html.twig', id: app.api.collector }
+
+    vehicle.api.listener:
+        class: App\Listener\ApiListener
+        arguments:
+            - '@router'
+            - '@vehicle.api.service'
+        tags:
+            - { event: kernel.request, name: kernel.event_listener, method: listenApi, priority: 0 }
+
+    vehicle.api.service:
+        class: App\Services\ApiService

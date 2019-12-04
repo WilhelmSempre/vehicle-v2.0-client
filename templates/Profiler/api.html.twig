@@ -1,0 +1,26 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <svg style="fill:#ffffff;fill-opacity:.5;stroke-width:1.53846157" enable-background="new 0 0 32 32" height="32px" id="svg2" version="1.1" viewBox="0 0 32 32" width="32px"
+             xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g id="background"><rect fill="#fff" height="32" width="32"></rect></g>
+            <g id="api"><polygon points="0,6 14,6 14,14 10,14 10,18 14,18 14,26 0,26"></polygon>
+                <polygon points="20,18 16,18 16,14 20,14 20,10 32,10 32,22 20,22"></polygon></g></svg>
+        <span class="sf-toolbar-value">{{ collector.url }}</span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Status</b>
+            <span>
+                {{ collector.status }}
+
+                {% if collector.message is defined and collector.message != '' %}
+                    ( {{ collector.message }} )
+                {% endif %}
+            </span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
+{% endblock %}
