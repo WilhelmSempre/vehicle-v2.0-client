@@ -1,0 +1,45 @@
+.vehicle-sidebar {
+
+  .vehicle-sidebar-brand-link {
+    border-bottom: 0;
+  }
+
+  .vehicle-user-panel {
+    align-items: center;
+
+    .vehicle-user-info {
+      font-size: 14px;
+    }
+  }
+
+  .vehicle-navbar-list {
+    .vehicle-navbar-item {
+      .vehicle-navbar-link {
+        .vehicle-navbar-link-title {
+          font-size: 14px;
+
+          .vehicle-navbar-dropdown-icon {
+            top: 0.9rem;
+          }
+        }
+
+        &.active {
+          box-shadow: none;
+          color: #fff;
+
+          @include vehicle-pink-blue-gradient;
+        }
+      }
+
+      .nav-treeview {
+        .vehicle-navbar-link {
+          &.active {
+            box-shadow: none;
+            background: none;
+            color: #000;
+          }
+        }
+      }
+    }
+  }
+}
