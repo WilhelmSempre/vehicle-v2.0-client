@@ -1,5 +1,23 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 
 {% block title %}
     Offline page - Vehicle
 {% endblock %}
+
+{% block header %}{% endblock %}
+{% block sidebar %}{% endblock %}
+
+{% block main %}
+    <main class="container-fluid offline-page">
+        {% block content %}
+            <div class="offline-wrapper">
+                <h1 class="vehicle-offline-header">Offline mode</h1>
+                <p class="vehicle-offline-text">It seems that you cannot connect with the API server and now you are in offline mode. Check API connection and refresh the page.</p>
+
+                <a class="btn vehicle-gradient-button" href="{{ path('main') }}">Refresh page</a>
+            </div>
+        {% endblock %}
+    </main>
+{% endblock %}
+
+{% block footer %}{% endblock %}

@@ -2,11 +2,14 @@
 
 namespace App\DataCollector;
 
-use App\Exception\ApiUrlMissingException;
+use App\Mappers\ApiAuthorizationMapper;
 use App\Services\ApiService;
+use JMS\Serializer\Serializer;
+use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -24,7 +27,7 @@ class ApiCollector extends DataCollector
     /**
      * @var array
      */
-    protected $data = [];
+    protected $data;
 
     /**
      * @var ApiService
@@ -32,17 +35,27 @@ class ApiCollector extends DataCollector
     private $apiService;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * ApiCollector constructor.
      * @param ApiService $apiService
      */
-    public function __construct(ApiService $apiService)
+    public function __construct(ApiService $apiService, SerializerInterface $serializer)
     {
         $this->apiService = $apiService;
+        $this->serializer = $serializer;
     }
 
     /**
      * @param Request $request
      * @param Response $response
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      */
     public function collect(Request $request, Response $response): void
     {
@@ -55,62 +68,45 @@ class ApiCollector extends DataCollector
 
         $apiAuthorization = $this->checkApiAuthorization();
 
-        if ($apiStatus && $apiAuthorization['status'] === Response::HTTP_OK) {
+        $format = $_ENV['API_RESPONSE_FORMAT'] ?? 'json';
+        $format = in_array($format, ['xml', 'json'], true) ? $format : 'json';
+
+        /** @var ApiAuthorizationMapper $apiAuthorization */
+        $apiAuthorization = $this->serializer
+            ->deserialize($apiAuthorization, ApiAuthorizationMapper::class, $format);
+
+        if ($apiStatus && (int) $apiAuthorization->getStatus() === Response::HTTP_OK) {
             $this->data['status'] = 'Connected';
         }
 
-        if (!empty($apiAuthorization['message'])) {
-            $this->data['message'] = $apiAuthorization['message'];
+        if (!empty($apiAuthorization->getMessage())) {
+            $this->data['message'] = $apiAuthorization->getMessage();
         }
     }
 
     /**
-     * @return array
+     * @return string
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      */
-    private function checkApiAuthorization(): array
+    private function checkApiAuthorization(): string
     {
-        try {
-            return $this->apiService
-                ->checkApiAuthorization();
-        } catch (ApiUrlMissingException $error) {
-            return [
-                'status' => Response::HTTP_FORBIDDEN,
-                'message' => $error->getMessage(),
-            ];
-        } catch (ClientExceptionInterface $error) {
-            return [
-                'status' => Response::HTTP_FORBIDDEN,
-                'message' => $error->getMessage(),
-            ];
-        } catch (RedirectionExceptionInterface $error) {
-            return [
-                'status' => Response::HTTP_FORBIDDEN,
-                'message' => $error->getMessage(),
-            ];
-        } catch (ServerExceptionInterface $error) {
-            return [
-                'status' => Response::HTTP_FORBIDDEN,
-                'message' => $error->getMessage(),
-            ];
-        } catch (TransportExceptionInterface $error) {
-            return [
-                'status' => Response::HTTP_FORBIDDEN,
-                'message' => $error->getMessage(),
-            ];
-        }
+        return $this->apiService
+            ->checkApiAuthorization();
     }
 
     /**
      * @return bool
+     * @throws TransportExceptionInterface
      */
     private function checkApiStatus(): bool
     {
         try {
             return $this->apiService
                 ->checkApiStatus();
-        } catch (ApiUrlMissingException $error) {
-            return false;
-        } catch (TransportExceptionInterface $error) {
+        } catch (HttpException $error) {
             return false;
         }
     }

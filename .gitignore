@@ -13,3 +13,7 @@ logs/
 var/cache
 var/log
 phpunit.xml.dist
+/node_modules/
+/public/build/
+npm-debug.log
+yarn-error.log

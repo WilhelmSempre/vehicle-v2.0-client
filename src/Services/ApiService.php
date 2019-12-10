@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Exception\ApiUrlMissingException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -22,7 +22,6 @@ class ApiService
 
     /**
      * @return bool
-     * @throws ApiUrlMissingException
      * @throws TransportExceptionInterface
      */
     public function checkApiStatus(): bool
@@ -30,7 +29,7 @@ class ApiService
         $apiUrl = $this->getApiUrl();
 
         if (!$apiUrl) {
-            throw new ApiUrlMissingException('No api url defined');
+            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, 'No api url defined');
         }
 
         $httpClient = HttpClient::create();
@@ -42,28 +41,29 @@ class ApiService
     }
 
     /**
-     * @return array
-     * @throws ApiUrlMissingException
-     * @throws TransportExceptionInterface
+     * @return string
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      */
-    public function checkApiAuthorization(): array
+    public function checkApiAuthorization(): string
     {
         $apiUrl = $this->getApiUrl();
 
         if (!$apiUrl) {
-            throw new ApiUrlMissingException('No api url defined');
+            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, 'No api url defined');
         }
 
         $httpClient = HttpClient::create();
 
-        $authorizationRequestUrl = sprintf('%s/authorize/%s', $apiUrl, $_ENV['APP_SECRET']);
+        $format = $_ENV['API_RESPONSE_FORMAT'] ?? 'json';
+
+        $authorizationRequestUrl = sprintf('%s/authorize/%s?format=%s', $apiUrl, $_ENV['APP_SECRET'], $format);
 
         $response = $httpClient->request(Request::METHOD_GET, $authorizationRequestUrl);
 
-        return json_decode($response->getContent(), true);
+        return $response->getContent();
     }
 
     /**

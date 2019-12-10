@@ -1,0 +1,20 @@
+.offline-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  height: 100vh;
+
+  .offline-wrapper {
+    text-align: center;
+
+    .vehicle-offline-header {
+      width: 100%;
+      text-align: center;
+    }
+
+    .vehicle-offline-text {
+      font-size: 0.875rem;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+.vehicle-gradient-button {
+  @include vehicle-pink-blue-gradient;
+
+  color: #fff;
+  border: 0;
+  font-size: 0.875rem;
+
+  &:hover {
+    color: #fff;
+  }
+}

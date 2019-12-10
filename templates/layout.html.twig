@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {% block header %}
+        {% include 'header.html.twig' %}
+    {% endblock %}
+
+    {% block sidebar %}
+        {% include 'sidebar.html.twig' %}
+    {% endblock %}
+
+    {% block main %}
+        <main class="content-wrapper">
+            {% block content %}{% endblock %}
+        </main>
+    {% endblock %}
+
+    {% block footer %}
+        {% include 'footer.html.twig' %}
+    {% endblock %}
+{% endblock %}

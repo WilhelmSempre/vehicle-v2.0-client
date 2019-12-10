@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css?family=Exo&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+body {
+    background-color: lightgray;
+  font-family: 'Open Sans', sans-serif;
+}
+
+@import "variables";
+@import "mixins";
+@import "gradients";
+@import "buttons";
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Exo', sans-serif;
+  color: $primaryColor;
+}
+
+@import "partials/header";
+@import "partials/sidebar";
+@import "partials/footer";
+
+@import "modules/message";
+@import "modules/notifications";
+@import "modules/offline";

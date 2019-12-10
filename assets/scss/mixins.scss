@@ -1,0 +1,4 @@
+@mixin vehicle-pink-blue-gradient {
+  background: rgb(0,43,127);
+  background: linear-gradient(180deg, rgba(0,43,127,1) 0%, rgba(206,0,233,1) 100%);
+}
