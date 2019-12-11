@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpFoundation\Request;
+use App\Mappers\ApiAuthorizationMapper;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Class ApiService
@@ -21,20 +20,35 @@ class ApiService
 {
 
     /**
+     * @var ApiAdapter
+     */
+    private $adapter;
+
+    /**
+     * ApiService constructor.
+     * @param ApiAdapter $adapter
+     */
+    public function __construct(ApiAdapter $adapter)
+    {
+        $this->adapter = $adapter;
+    }
+
+    /**
      * @return bool
      * @throws TransportExceptionInterface
      */
     public function checkApiStatus(): bool
     {
-        $apiUrl = $this->getApiUrl();
 
-        if (!$apiUrl) {
-            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, 'No api url defined');
+        /** @var ResponseInterface $response */
+        $response = $this->adapter
+            ->getStatus()
+        ;
+
+        if (!$response) {
+            return false;
         }
 
-        $httpClient = HttpClient::create();
-
-        $response = $httpClient->request(Request::METHOD_GET, $apiUrl);
         $responseStatusCode = $response->getStatusCode();
 
         return $responseStatusCode === Response::HTTP_OK;
@@ -49,28 +63,22 @@ class ApiService
      */
     public function checkApiAuthorization(): string
     {
-        $apiUrl = $this->getApiUrl();
 
-        if (!$apiUrl) {
-            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, 'No api url defined');
-        }
-
-        $httpClient = HttpClient::create();
-
-        $format = $_ENV['API_RESPONSE_FORMAT'] ?? 'json';
-
-        $authorizationRequestUrl = sprintf('%s/authorize/%s?format=%s', $apiUrl, $_ENV['APP_SECRET'], $format);
-
-        $response = $httpClient->request(Request::METHOD_GET, $authorizationRequestUrl);
+        /** @var ResponseInterface $response */
+        $response = $this->adapter
+            ->get('authorize/{secret}', [
+                '{secret}' => $_ENV['APP_SECRET'],
+            ])
+        ;
 
         return $response->getContent();
     }
 
     /**
-     * @return string
+     * @return ApiAdapter
      */
-    public function getApiUrl(): ?string
+    public function getAdapter(): ApiAdapter
     {
-        return $_ENV['API_URL_ADDRESS'];
+        return $this->adapter;
     }
 }

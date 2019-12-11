@@ -11,13 +11,19 @@
 
     {% set text %}
         <div class="sf-toolbar-info-piece">
-            <b>Status</b>
+            <b>Status:</b>
             <span>
                 {{ collector.status }}
 
                 {% if collector.message is defined and collector.message != '' %}
                     ( {{ collector.message }} )
                 {% endif %}
+            </span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Format:</b>
+            <span>
+                {{ collector.format }}
             </span>
         </div>
     {% endset %}

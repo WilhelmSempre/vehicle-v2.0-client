@@ -3,6 +3,7 @@
 namespace App\DataCollector;
 
 use App\Mappers\ApiAuthorizationMapper;
+use App\Services\ApiAdapter;
 use App\Services\ApiService;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerInterface;
@@ -42,6 +43,7 @@ class ApiCollector extends DataCollector
     /**
      * ApiCollector constructor.
      * @param ApiService $apiService
+     * @param SerializerInterface $serializer
      */
     public function __construct(ApiService $apiService, SerializerInterface $serializer)
     {
@@ -62,18 +64,21 @@ class ApiCollector extends DataCollector
         $this->data['status'] = 'No connected';
         $this->data['message'] = null;
 
+        /** @var ApiAdapter $adapter */
+        $adapter = $this->apiService
+            ->getAdapter()
+        ;
+
         $apiStatus = $this->checkApiStatus();
 
-        $this->data['url'] = $this->getApiUrl();
+        $this->data['url'] = $adapter->getApiUrl();
 
         $apiAuthorization = $this->checkApiAuthorization();
 
-        $format = $_ENV['API_RESPONSE_FORMAT'] ?? 'json';
-        $format = in_array($format, ['xml', 'json'], true) ? $format : 'json';
-
         /** @var ApiAuthorizationMapper $apiAuthorization */
-        $apiAuthorization = $this->serializer
-            ->deserialize($apiAuthorization, ApiAuthorizationMapper::class, $format);
+        $apiAuthorization = $adapter->deserialize($apiAuthorization, ApiAuthorizationMapper::class);
+
+        $this->data['format'] = $adapter->getFormat();
 
         if ($apiStatus && (int) $apiAuthorization->getStatus() === Response::HTTP_OK) {
             $this->data['status'] = 'Connected';
@@ -110,16 +115,6 @@ class ApiCollector extends DataCollector
             return false;
         }
     }
-
-    /**
-     * @return string|null
-     */
-    private function getApiUrl(): ?string
-    {
-        return $this->apiService
-            ->getApiUrl();
-    }
-
 
     /**
      * @return string
@@ -159,5 +154,13 @@ class ApiCollector extends DataCollector
     public function getUrl(): ?string
     {
         return $this->data['url'];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFormat(): ?string
+    {
+        return $this->data['format'];
     }
 }

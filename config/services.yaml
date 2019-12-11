@@ -45,3 +45,16 @@ services:
 
   vehicle.api.service:
     class: App\Services\ApiService
+    arguments:
+      - '@vehicle.api.adapter'
+      - '@jms_serializer.serializer'
+
+  vehicle.api.adapter:
+    class: App\Services\ApiAdapter
+
+  vehicle.menu.factory:
+    class: App\Menu\Menu
+    arguments:
+      - '@knp_menu.factory'
+    tags:
+      - { name: knp_menu.menu_builder, method: createSidebarMenu, alias: sidebar }

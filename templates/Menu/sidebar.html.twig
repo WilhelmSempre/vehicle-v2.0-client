@@ -1,0 +1,29 @@
+{% extends 'knp_menu.html.twig' %}
+
+{%- block spanElement %}
+    {% import _self as knp_menu %}
+    <p{{ knp_menu.attributes(item.labelAttributes) }}>
+        {{ block('label') }}
+        {% if item.extras.badge is defined and item.extras.badge is not empty %}
+            {% block badge %}
+                <span class="right badge badge-danger">{{ item.extras.badge.content }}</span>
+            {% endblock %}
+        {% endif %}
+
+        {% if item.hasChildren and options.depth is not same as(0) %}
+            {% block dropdown_icon %}
+                <i class="right fas fa-angle-left vehicle-navbar-dropdown-icon"></i>
+            {% endblock %}
+        {% endif %}
+    </p>
+{%- endblock %}
+
+{%- block linkElement %}
+    {% import _self as knp_menu %}
+    <a href="{{ item.uri }}"{{ knp_menu.attributes(item.linkAttributes) }}>
+        {% if item.extras.icon is defined and item.extras.icon is not empty %}
+            <i class="{{ item.extras.icon }} nav-icon"></i>
+        {% endif %}
+        {{ block('spanElement') }}
+    </a>
+{%- endblock %}
