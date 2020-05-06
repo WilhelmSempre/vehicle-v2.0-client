@@ -29,12 +29,12 @@ class RequestListener
     /**
      * @var Router
      */
-    private $router;
+    private Router $router;
 
     /**
      * @var ApiService
      */
-    private $apiService;
+    private ApiService $apiService;
 
     /**
      * ApiListener constructor.
@@ -100,7 +100,7 @@ class RequestListener
      * @param RequestEvent $event
      * @return RedirectResponse
      */
-    public function setOfflinePage(RequestEvent $event): Response
+    public function setOfflinePage(RequestEvent $event): ?Response
     {
         $offlineRoute = $this->router->generate('offline_index');
 

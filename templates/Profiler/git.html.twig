@@ -39,7 +39,11 @@
         <div class="sf-toolbar-info-piece">
             <b>Date:</b>
             <span>
-                {{ collector.getLastCommitDate()|date('Y F jS \\a\\t H:i:s') }}
+                {% if collector.getLastCommitDate() != 'N/A' %}
+                    {{ collector.getLastCommitDate()|date('Y F jS \\a\\t H:i:s') }}
+                {% else %}
+                    {{ collector.getLastCommitDate() }}
+                {% endif %}
             </span>
         </div>
     {% endset %}

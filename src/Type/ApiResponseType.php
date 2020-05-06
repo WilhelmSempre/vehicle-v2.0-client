@@ -3,10 +3,10 @@
 namespace App\Type;
 
 /**
- * Class EndpointResponseType
+ * Class ApiResponseType
  * @package App\Type
  */
-class EndpointResponseType
+class ApiResponseType
 {
     const JSON = 'json';
     const XML = 'xml';

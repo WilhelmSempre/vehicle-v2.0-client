@@ -22,15 +22,30 @@ class ApiService
     /**
      * @var ApiAdapter
      */
-    private $adapter;
+    private ApiAdapter $adapter;
+
+    /**
+     * @var AuthorizationService
+     */
+    private AuthorizationService $authorizationService;
+
+    /**
+     * @var array
+     */
+    private array $secretEncrypted;
 
     /**
      * ApiService constructor.
      * @param ApiAdapter $adapter
+     * @param AuthorizationService $authorizationService
      */
-    public function __construct(ApiAdapter $adapter)
+    public function __construct(ApiAdapter $adapter, AuthorizationService $authorizationService)
     {
         $this->adapter = $adapter;
+
+        $this->secretEncrypted = $authorizationService
+            ->encrypt($_ENV['APP_SECRET'])
+        ;
     }
 
     /**
@@ -60,14 +75,16 @@ class ApiService
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
+     * @throws \Exception
      */
     public function checkApiAuthorization(): string
     {
 
         /** @var ResponseInterface $response */
         $response = $this->adapter
-            ->get('authorize/{secret}', [
-                '{secret}' => $_ENV['APP_SECRET'],
+            ->post('authorize', [
+                'secret' => $this->secretEncrypted['secret'],
+                'iv' => $this->secretEncrypted['iv'],
             ])
         ;
 
@@ -80,13 +97,16 @@ class ApiService
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
+     * @throws \Exception
      */
     public function getApiGitLogs()
     {
+
         /** @var ResponseInterface $response */
         $response = $this->adapter
-            ->get('git/summary/{secret}', [
-                '{secret}' => $_ENV['APP_SECRET'],
+            ->post('git/summary', [
+                'secret' => $this->secretEncrypted['secret'],
+                'iv' => $this->secretEncrypted['iv'],
             ])
         ;
 

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Mappers\ApiAuthorizationMapper;
 use App\Mappers\ApiResponseMapperInterface;
-use App\Type\EndpointResponseType;
+use App\Type\ApiResponseType;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +29,7 @@ class ApiAdapter
     /**
      * @var SerializerInterface
      */
-    private $serializer;
+    private SerializerInterface $serializer;
 
     /**
      * ApiAdapter constructor.
@@ -53,8 +53,8 @@ class ApiAdapter
      */
     public function getFormat(): string
     {
-        $format = $_ENV['API_RESPONSE_FORMAT'] ?? EndpointResponseType::JSON;
-        $format = in_array($format, [EndpointResponseType::XML, EndpointResponseType::JSON], true) ? $format : EndpointResponseType::JSON;
+        $format = $_ENV['API_RESPONSE_FORMAT'] ?? ApiResponseType::JSON;
+        $format = in_array($format, [ApiResponseType::XML, ApiResponseType::JSON], true) ? $format : ApiResponseType::JSON;
 
         return $format;
     }
@@ -84,7 +84,9 @@ class ApiAdapter
         $apiUrl = sprintf('%s/%s?format=%s', $apiUrl, $endpoint, $format);
 
         try {
-            return $httpClient->request($method, $apiUrl);
+            return $httpClient->request($method, $apiUrl, [
+                'body' => $options
+            ]);
         } catch (ExceptionInterface $error) {}
 
         return null;

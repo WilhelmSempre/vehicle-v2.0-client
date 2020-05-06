@@ -33,7 +33,8 @@
     "symfony/mailer": "4.4.*",
     "symfony/webpack-encore-bundle": "^1.7",
     "symfony/yaml": "4.4.*",
-    "vich/uploader-bundle": "^1.12"
+    "vich/uploader-bundle": "^1.12",
+    "ext-sodium": "*"
   },
   "require-dev": {
     "easycorp/easy-log-handler": "^1.0.7",

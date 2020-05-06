@@ -34,12 +34,12 @@ class GitCollector extends DataCollector
     /**
      * @var ApiService
      */
-    private $apiService;
+    private ApiService $apiService;
 
     /**
      * @var SerializerInterface
      */
-    private $serializer;
+    private SerializerInterface $serializer;
 
     /**
      * ApiCollector constructor.
@@ -62,11 +62,11 @@ class GitCollector extends DataCollector
      */
     public function collect(Request $request, Response $response): void
     {
-        $this->data['commit_hash'] = null;
-        $this->data['commit_message'] = null;
-        $this->data['commit_author'] = null;
-        $this->data['commit_date'] = null;
-        $this->data['commit_branch'] = null;
+        $this->data['commit_hash'] = 'N/A';
+        $this->data['commit_message'] = 'N/A';
+        $this->data['commit_author'] = 'N/A';
+        $this->data['commit_date'] = 'N/A';
+        $this->data['commit_branch'] = 'N/A';
 
         $adapter = $this->apiService
             ->getAdapter()

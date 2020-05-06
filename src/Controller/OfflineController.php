@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 class OfflineController extends AbstractController
 {
 
-
     /**
      * @Route("/index", name="index")
      *
