@@ -75,6 +75,25 @@ class ApiService
     }
 
     /**
+     * @return string
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function getApiGitLogs()
+    {
+        /** @var ResponseInterface $response */
+        $response = $this->adapter
+            ->get('git/summary/{secret}', [
+                '{secret}' => $_ENV['APP_SECRET'],
+            ])
+        ;
+
+        return $response->getContent();
+    }
+
+    /**
      * @return ApiAdapter
      */
     public function getAdapter(): ApiAdapter

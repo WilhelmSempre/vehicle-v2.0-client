@@ -34,6 +34,14 @@ services:
     tags:
       - { name: data_collector, template: 'Profiler/api.html.twig', id: app.api.collector }
 
+  vehicle.profiler.git.collector:
+    class: App\DataCollector\GitCollector
+    arguments:
+      - '@vehicle.api.service'
+      - '@jms_serializer.serializer'
+    tags:
+      - { name: data_collector, template: 'Profiler/git.html.twig', id: app.git.collector }
+
   vehicle.request.listener:
     class: App\Listener\RequestListener
     arguments:

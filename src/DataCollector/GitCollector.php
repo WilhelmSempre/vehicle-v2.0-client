@@ -3,6 +3,7 @@
 namespace App\DataCollector;
 
 use App\Mappers\ApiAuthorizationMapper;
+use App\Mappers\GitMapper;
 use App\Services\ApiAdapter;
 use App\Services\ApiService;
 use JMS\Serializer\Serializer;
@@ -17,12 +18,12 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
- * Class ApiCollector
+ * Class GitCollector
  * @package App\DataCollector
  *
  * @author Rafał Głuszak <rafal.gluszak@gmail.com>
  */
-class ApiCollector extends DataCollector
+class GitCollector extends DataCollector
 {
 
     /**
@@ -61,30 +62,40 @@ class ApiCollector extends DataCollector
      */
     public function collect(Request $request, Response $response): void
     {
-        $this->data['status'] = 'No connected';
-        $this->data['message'] = null;
+        $this->data['commit_hash'] = null;
+        $this->data['commit_message'] = null;
+        $this->data['commit_author'] = null;
+        $this->data['commit_date'] = null;
+        $this->data['commit_branch'] = null;
 
         $adapter = $this->apiService
             ->getAdapter()
         ;
 
-        $apiStatus = $this->checkApiStatus();
+        $gitLogs = $this->getApiGitLogs();
 
-        $this->data['url'] = $adapter->getApiUrl();
+        /** @var GitMapper $gitLogs */
+        $gitLogs = $adapter->deserialize($gitLogs, GitMapper::class);
 
-        $apiAuthorization = $this->checkApiAuthorization();
 
-        /** @var ApiAuthorizationMapper $apiAuthorization */
-        $apiAuthorization = $adapter->deserialize($apiAuthorization, ApiAuthorizationMapper::class);
-
-        $this->data['format'] = $adapter->getFormat();
-
-        if ($apiStatus && (int) $apiAuthorization->getStatus() === Response::HTTP_OK) {
-            $this->data['status'] = 'Connected';
+        if (!empty($gitLogs->getLastCommitMessage())) {
+            $this->data['commit_message'] = $gitLogs->getLastCommitMessage();
         }
 
-        if (!empty($apiAuthorization->getMessage())) {
-            $this->data['message'] = $apiAuthorization->getMessage();
+        if (!empty($gitLogs->getBranchName())) {
+            $this->data['commit_branch'] = $gitLogs->getBranchName();
+        }
+
+        if (!empty($gitLogs->getLastCommitAuthor())) {
+            $this->data['commit_author'] = $gitLogs->getLastCommitAuthor();
+        }
+
+        if (!empty($gitLogs->getLastCommitDate())) {
+            $this->data['commit_date'] = $gitLogs->getLastCommitDate();
+        }
+
+        if (!empty($gitLogs->getLastCommitHash())) {
+            $this->data['commit_hash'] = $gitLogs->getLastCommitHash();
         }
     }
 
@@ -95,26 +106,11 @@ class ApiCollector extends DataCollector
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    private function checkApiAuthorization(): string
+    private function getApiGitLogs(): string
     {
         return $this->apiService
-            ->checkApiAuthorization()
+            ->getApiGitLogs()
         ;
-    }
-
-    /**
-     * @return bool
-     * @throws TransportExceptionInterface
-     */
-    private function checkApiStatus(): bool
-    {
-        try {
-            return $this->apiService
-                ->checkApiStatus()
-            ;
-        } catch (HttpException $error) {
-            return false;
-        }
     }
 
     /**
@@ -122,7 +118,7 @@ class ApiCollector extends DataCollector
      */
     public function getName(): string
     {
-        return 'app.api.collector';
+        return 'app.git.collector';
     }
 
     /**
@@ -134,34 +130,42 @@ class ApiCollector extends DataCollector
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStatus(): string
+    public function getBranchName(): ?string
     {
-        return $this->data['status'];
-    }
-
-    /**
-     * @return string
-     */
-    public function getMessage(): ?string
-    {
-        return $this->data['message'];
+        return $this->data['commit_branch'];
     }
 
     /**
      * @return string|null
      */
-    public function getUrl(): ?string
+    public function getLastCommitAuthor(): ?string
     {
-        return $this->data['url'];
+        return $this->data['commit_author'];
     }
 
     /**
      * @return string|null
      */
-    public function getFormat(): ?string
+    public function getLastCommitDate(): ?string
     {
-        return $this->data['format'];
+        return $this->data['commit_date'];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLastCommitMessage(): ?string
+    {
+        return $this->data['commit_message'];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLastCommitHash(): ?string
+    {
+        return $this->data['commit_hash'];
     }
 }

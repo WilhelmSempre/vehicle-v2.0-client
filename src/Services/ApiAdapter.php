@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mappers\ApiAuthorizationMapper;
 use App\Mappers\ApiResponseMapperInterface;
+use App\Type\EndpointResponseType;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,8 +53,8 @@ class ApiAdapter
      */
     public function getFormat(): string
     {
-        $format = $_ENV['API_RESPONSE_FORMAT'] ?? 'json';
-        $format = in_array($format, ['xml', 'json'], true) ? $format : 'json';
+        $format = $_ENV['API_RESPONSE_FORMAT'] ?? EndpointResponseType::JSON;
+        $format = in_array($format, [EndpointResponseType::XML, EndpointResponseType::JSON], true) ? $format : EndpointResponseType::JSON;
 
         return $format;
     }
@@ -154,11 +155,12 @@ class ApiAdapter
      * @param string $entity
      * @return mixed
      */
-    public function deserialize(string $data, string $entity): ApiAuthorizationMapper
+    public function deserialize(string $data, string $entity): ApiResponseMapperInterface
     {
         $format = $this->getFormat();
 
         return $this->serializer
-            ->deserialize($data, $entity, $format);
+            ->deserialize($data, $entity, $format)
+        ;
     }
 }
