@@ -58,7 +58,6 @@ class RequestListener
     public function checkApiStatus(Request $request): Request
     {
 
-        /** @var ApiAdapter $adapter */
         $adapter = $this->apiService
             ->getAdapter()
         ;

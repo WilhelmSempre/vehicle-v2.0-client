@@ -32,7 +32,7 @@ services:
       - '@vehicle.api.service'
       - '@jms_serializer.serializer'
     tags:
-      - { name: data_collector, template: 'Profiler/api.html.twig', id: app.api.collector }
+      - { name: data_collector, template: 'Profiler/api.html.twig', id: api }
 
   vehicle.profiler.git.collector:
     class: App\DataCollector\GitCollector
@@ -40,14 +40,20 @@ services:
       - '@vehicle.api.service'
       - '@jms_serializer.serializer'
     tags:
-      - { name: data_collector, template: 'Profiler/git.html.twig', id: app.git.collector }
+      - { name: data_collector, template: 'Profiler/git.html.twig', id: git }
+
+  vehicle.profiler.api.log.collector:
+    class: App\DataCollector\ApiLogCollector
+    arguments:
+      - '@kernel'
+    tags:
+      - { name: data_collector, template: 'Profiler/api-logs.html.twig', id: api-log }
 
   vehicle.request.listener:
     class: App\Listener\RequestListener
     arguments:
       - '@router'
       - '@vehicle.api.service'
-      - '@jms_serializer.serializer'
     tags:
       - { event: kernel.request, name: kernel.event_listener, method: listen, priority: 0 }
 
@@ -57,8 +63,21 @@ services:
       - '@vehicle.api.adapter'
       - '@vehicle.authorization.service'
 
+  vehicle.api.log.service:
+    class: App\Services\ApiLogService
+    arguments:
+      - '@monolog.logger.api'
+
+  vehicle.api.log.listener:
+    class: App\Listener\ApiLogListener
+    arguments:
+      - '@vehicle.api.log.service'
+
   vehicle.api.adapter:
     class: App\Services\ApiAdapter
+    arguments:
+      - "@jms_serializer.serializer"
+      - "@event_dispatcher"
 
   vehicle.menu.factory:
     class: App\Menu\Menu

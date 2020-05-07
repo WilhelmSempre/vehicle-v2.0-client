@@ -118,7 +118,7 @@ class GitCollector extends DataCollector
      */
     public function getName(): string
     {
-        return 'app.git.collector';
+        return 'git';
     }
 
     /**

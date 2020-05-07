@@ -25,11 +25,6 @@ class ApiService
     private ApiAdapter $adapter;
 
     /**
-     * @var AuthorizationService
-     */
-    private AuthorizationService $authorizationService;
-
-    /**
      * @var array
      */
     private array $secretEncrypted;
@@ -38,6 +33,7 @@ class ApiService
      * ApiService constructor.
      * @param ApiAdapter $adapter
      * @param AuthorizationService $authorizationService
+     * @throws \Exception
      */
     public function __construct(ApiAdapter $adapter, AuthorizationService $authorizationService)
     {

@@ -2,18 +2,17 @@
 
 namespace App\Services;
 
-use App\Mappers\ApiAuthorizationMapper;
+use App\Event\ApiRequestEvent;
+use App\Listener\ApiLogListener;
 use App\Mappers\ApiResponseMapperInterface;
 use App\Type\ApiResponseType;
 use JMS\Serializer\SerializerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -32,12 +31,26 @@ class ApiAdapter
     private SerializerInterface $serializer;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private EventDispatcherInterface $eventDispatcher;
+
+    /**
+     * @var ApiLogListener
+     */
+    private ApiLogListener $apiLogListener;
+
+    /**
      * ApiAdapter constructor.
      * @param SerializerInterface $serializer
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param ApiLogListener $apiLogListener
      */
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(SerializerInterface $serializer, EventDispatcherInterface $eventDispatcher, ApiLogListener $apiLogListener)
     {
         $this->serializer = $serializer;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->apiLogListener = $apiLogListener;
     }
 
     /**
@@ -63,9 +76,10 @@ class ApiAdapter
      * @param string $method
      * @param string $endpoint
      * @param array $options
+     * @param bool $log
      * @return ResponseInterface|null
      */
-    private function call(string $method, string $endpoint, array $options = null): ?ResponseInterface
+    private function call(string $method, string $endpoint, array $options = null, $log = true): ?ResponseInterface
     {
         $apiUrl = $this->getApiUrl();
 
@@ -84,9 +98,25 @@ class ApiAdapter
         $apiUrl = sprintf('%s/%s?format=%s', $apiUrl, $endpoint, $format);
 
         try {
-            return $httpClient->request($method, $apiUrl, [
+            $response = $httpClient->request($method, $apiUrl, [
                 'body' => $options
             ]);
+
+            if ($log) {
+                $apiRequestEvent = new ApiRequestEvent();
+
+                $apiRequestEvent
+                    ->setPath($endpoint)
+                    ->setRequestData(json_encode($options))
+                    ->setStatus((int) $response->getStatusCode())
+                    ->setResponse(json_encode($response->getContent()))
+                ;
+
+                $this->eventDispatcher->addListener(ApiRequestEvent::NAME, [$this->apiLogListener, 'log']);
+                $this->eventDispatcher->dispatch($apiRequestEvent, ApiRequestEvent::NAME);
+            }
+
+            return $response;
         } catch (ExceptionInterface $error) {}
 
         return null;
@@ -115,41 +145,45 @@ class ApiAdapter
     /**
      * @param string $endpoint
      * @param array $options
+     * @param bool $log
      * @return ResponseInterface|null
      */
-    public function get(string $endpoint, array $options = null): ?ResponseInterface
+    public function get(string $endpoint, array $options = null, $log = false): ?ResponseInterface
     {
-        return $this->call(Request::METHOD_GET, $endpoint, $options);
+        return $this->call(Request::METHOD_GET, $endpoint, $options, $log);
     }
 
     /**
      * @param string $endpoint
      * @param array $options
+     * @param bool $log
      * @return ResponseInterface|null
      */
-    public function post(string $endpoint, array $options = null): ?ResponseInterface
+    public function post(string $endpoint, array $options = null, $log = true): ?ResponseInterface
     {
-        return $this->call(Request::METHOD_POST, $endpoint, $options);
+        return $this->call(Request::METHOD_POST, $endpoint, $options, $log);
     }
 
     /**
      * @param string $endpoint
      * @param array $options
+     * @param bool $log
      * @return ResponseInterface|null
      */
-    public function delete(string $endpoint, array $options = null): ?ResponseInterface
+    public function delete(string $endpoint, array $options = null, $log = false): ?ResponseInterface
     {
-        return $this->call(Request::METHOD_DELETE, $endpoint, $options);
+        return $this->call(Request::METHOD_DELETE, $endpoint, $options, $log);
     }
 
     /**
      * @param string $endpoint
      * @param array $options
+     * @param bool $log
      * @return ResponseInterface|null
      */
-    public function put(string $endpoint, array $options): ?ResponseInterface
+    public function put(string $endpoint, array $options, $log = false): ?ResponseInterface
     {
-        return $this->call(Request::METHOD_PUT, $endpoint, $options);
+        return $this->call(Request::METHOD_PUT, $endpoint, $options, $log);
     }
 
     /**

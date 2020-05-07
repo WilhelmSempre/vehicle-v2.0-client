@@ -33,12 +33,12 @@ class ApiCollector extends DataCollector
     /**
      * @var ApiService
      */
-    private $apiService;
+    private ApiService $apiService;
 
     /**
      * @var SerializerInterface
      */
-    private $serializer;
+    private SerializerInterface $serializer;
 
     /**
      * ApiCollector constructor.
@@ -122,7 +122,7 @@ class ApiCollector extends DataCollector
      */
     public function getName(): string
     {
-        return 'app.api.collector';
+        return 'api';
     }
 
     /**
