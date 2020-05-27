@@ -2,7 +2,7 @@
 
 namespace App\DataCollector;
 
-use App\Mappers\ApiAuthorizationMapper;
+use App\Mappers\ResultMapper;
 use App\Mappers\GitMapper;
 use App\Services\ApiAdapter;
 use App\Services\ApiService;
@@ -74,6 +74,10 @@ class GitCollector extends DataCollector
 
         $gitLogs = $this->getApiGitLogs();
 
+        if (!$gitLogs) {
+            return;
+        }
+
         /** @var GitMapper $gitLogs */
         $gitLogs = $adapter->deserialize($gitLogs, GitMapper::class);
 
@@ -100,13 +104,13 @@ class GitCollector extends DataCollector
     }
 
     /**
-     * @return string
+     * @return string|null
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    private function getApiGitLogs(): string
+    private function getApiGitLogs(): ?string
     {
         return $this->apiService
             ->getApiGitLogs()

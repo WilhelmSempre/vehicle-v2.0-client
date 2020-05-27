@@ -12,6 +12,18 @@
 
     {% block main %}
         <main class="content-wrapper">
+            {% for message in app.flashes('success') %}
+                <p class="alert alert-success">
+                    {{ message }}
+                </p>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <p class="alert alert-danger">
+                    {{ message }}
+                </p>
+            {% endfor %}
+
             {% block content %}{% endblock %}
         </main>
     {% endblock %}

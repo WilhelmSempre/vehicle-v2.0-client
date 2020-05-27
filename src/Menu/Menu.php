@@ -44,7 +44,7 @@ class Menu
                 ],
             ]);
 
-        $starterPageMenuItem = $menu->addChild('Starter pages', [
+        $starterPageMenuItem = $menu->addChild('Users', [
             'attributes' => [
                 'class' => 'nav-item has-treeview menu-open vehicle-navbar-item',
             ],
@@ -59,11 +59,11 @@ class Menu
             ],
             'route' => 'main',
             'extras' => [
-                'icon' => 'fas fa-tachometer-alt',
+                'icon' => 'fas fa-user',
             ],
         ]);
 
-        $starterPageMenuItem->addChild('Test', [
+        $starterPageMenuItem->addChild('Create new user', [
             'attributes' => [
                 'class' => 'nav-item has-treeview menu-open vehicle-navbar-item',
             ],
@@ -76,50 +76,9 @@ class Menu
             'childrenAttributes' => [
                 'class' => 'nav nav-treeview',
             ],
-            'route' => 'main',
+            'route' => 'user_create',
             'extras' => [
                 'icon' => 'far fa-circle',
-            ],
-        ]);
-
-        $starterPageMenuItem->addChild('Test disabled', [
-            'attributes' => [
-                'class' => 'nav-item has-treeview menu-open vehicle-navbar-item',
-            ],
-            'labelAttributes' => [
-                'class' => 'vehicle-navbar-link-title',
-            ],
-            'linkAttributes' => [
-                'class' => 'nav-link vehicle-navbar-link',
-            ],
-            'childrenAttributes' => [
-                'class' => 'nav nav-treeview',
-            ],
-            'route' => 'main',
-            'extras' => [
-                'icon' => 'far fa-circle',
-            ],
-        ]);
-
-        $menu->addChild('Simple link', [
-            'attributes' => [
-                'class' => 'nav-item has-treeview menu-open vehicle-navbar-item',
-            ],
-            'labelAttributes' => [
-                'class' => 'vehicle-navbar-link-title',
-            ],
-            'linkAttributes' => [
-                'class' => 'nav-link vehicle-navbar-link',
-            ],
-            'childrenAttributes' => [
-                'class' => 'nav nav-treeview',
-            ],
-            'route' => 'main',
-            'extras' => [
-                'icon' => 'fas fa-th',
-                'badge' => [
-                    'content' => 'New',
-                ],
             ],
         ]);
 

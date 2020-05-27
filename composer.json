@@ -13,7 +13,9 @@
     "ext-ctype": "*",
     "ext-iconv": "*",
     "ext-json": "*",
+    "ext-sodium": "*",
     "almasaeed2010/adminlte": "~3.0",
+    "doctrine/annotations": "^1.10",
     "guzzlehttp/guzzle": "^6.4",
     "jms/serializer-bundle": "~3.5",
     "knplabs/knp-menu-bundle": "^3.0",
@@ -31,10 +33,10 @@
     "symfony/framework-bundle": "4.4.*",
     "symfony/http-kernel": "4.4.*",
     "symfony/mailer": "4.4.*",
+    "symfony/validator": "4.4.*",
     "symfony/webpack-encore-bundle": "^1.7",
     "symfony/yaml": "4.4.*",
-    "vich/uploader-bundle": "^1.12",
-    "ext-sodium": "*"
+    "vich/uploader-bundle": "^1.12"
   },
   "require-dev": {
     "easycorp/easy-log-handler": "^1.0.7",

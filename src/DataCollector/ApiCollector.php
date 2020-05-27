@@ -2,7 +2,7 @@
 
 namespace App\DataCollector;
 
-use App\Mappers\ApiAuthorizationMapper;
+use App\Mappers\ResultMapper;
 use App\Services\ApiAdapter;
 use App\Services\ApiService;
 use JMS\Serializer\Serializer;
@@ -72,30 +72,34 @@ class ApiCollector extends DataCollector
 
         $this->data['url'] = $adapter->getApiUrl();
 
-        $apiAuthorization = $this->checkApiAuthorization();
-
-        /** @var ApiAuthorizationMapper $apiAuthorization */
-        $apiAuthorization = $adapter->deserialize($apiAuthorization, ApiAuthorizationMapper::class);
-
         $this->data['format'] = $adapter->getFormat();
 
-        if ($apiStatus && (int) $apiAuthorization->getStatus() === Response::HTTP_OK) {
+        $apiAuthorizationResults = $this->checkApiAuthorization();
+
+        if (!$apiAuthorizationResults) {
+            return;
+        }
+
+        /** @var ResultMapper $apiAuthorizationResults */
+        $apiAuthorizationResults = $adapter->deserialize($apiAuthorizationResults, ResultMapper::class);
+
+        if ($apiStatus && (int) $apiAuthorizationResults->getStatus() === Response::HTTP_OK) {
             $this->data['status'] = 'Connected';
         }
 
-        if (!empty($apiAuthorization->getMessage())) {
-            $this->data['message'] = $apiAuthorization->getMessage();
+        if (!empty($apiAuthorizationResults->getMessage())) {
+            $this->data['message'] = $apiAuthorizationResults->getMessage();
         }
     }
 
     /**
-     * @return string
+     * @return string|null
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    private function checkApiAuthorization(): string
+    private function checkApiAuthorization(): ?string
     {
         return $this->apiService
             ->checkApiAuthorization()

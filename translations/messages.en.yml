@@ -1,0 +1,26 @@
+application:
+  name: 'Vehicle'
+
+user:
+  create:
+    title: 'Create new user'
+    info: 'Fill form to create new user who will be allowed to login into this system.'
+
+    form:
+      email: 'Email address:'
+      password: 'Password:'
+      password_confirm: 'Ret-type password:'
+      submit: 'Create'
+
+    hint:
+      header: 'Use useful tip from list to create safe user into system!'
+      content:
+        - 'Use safe password for new user. This is necessary for system safety'
+        - 'Password has to have more than 5 characters'
+        - 'Use digits, letters and special characters for passwords for safety'
+        - 'You will cannot change email address after registration'
+
+    alert:
+      success: 'New user created successfully'
+      error: 'Something went wrong. Call to office for feedback'
+      user_exists: 'User already exists in system!'

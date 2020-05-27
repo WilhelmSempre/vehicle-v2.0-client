@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Mappers\ApiAuthorizationMapper;
+use App\Mappers\ResultMapper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -66,23 +66,28 @@ class ApiService
     }
 
     /**
-     * @return string
+     * @return string|null
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      * @throws \Exception
      */
-    public function checkApiAuthorization(): string
+    public function checkApiAuthorization(): ?string
     {
+        $options = [
+            'secret' => $this->secretEncrypted['secret'],
+            'iv' => $this->secretEncrypted['iv'],
+        ];
 
         /** @var ResponseInterface $response */
         $response = $this->adapter
-            ->post('authorize', [
-                'secret' => $this->secretEncrypted['secret'],
-                'iv' => $this->secretEncrypted['iv'],
-            ])
+            ->post('authorize', $options)
         ;
+
+        if (!$response) {
+            return null;
+        }
 
         return $response->getContent();
     }
@@ -95,16 +100,21 @@ class ApiService
      * @throws TransportExceptionInterface
      * @throws \Exception
      */
-    public function getApiGitLogs()
+    public function getApiGitLogs(): ?string
     {
+        $options = [
+            'secret' => $this->secretEncrypted['secret'],
+            'iv' => $this->secretEncrypted['iv'],
+        ];
 
         /** @var ResponseInterface $response */
         $response = $this->adapter
-            ->post('git/summary', [
-                'secret' => $this->secretEncrypted['secret'],
-                'iv' => $this->secretEncrypted['iv'],
-            ])
+            ->post('git/summary', $options)
         ;
+
+        if (!$response) {
+            return null;
+        }
 
         return $response->getContent();
     }

@@ -14,14 +14,14 @@ class ApiRequestEvent extends Event
     const NAME = 'vehicle.api.request.event';
 
     /**
-     * @var string
+     * @var string|null
      */
-    private string $requestData;
+    private ?string $requestData;
 
     /**
-     * @var string
+     * @var string|
      */
-    private string $response;
+    private ?string $response;
 
     /**
      * @var string
@@ -45,10 +45,10 @@ class ApiRequestEvent extends Event
     }
 
     /**
-     * @param string $requestData
+     * @param string $requestData|null
      * @return $this
      */
-    public function setRequestData(string $requestData): self
+    public function setRequestData(?string $requestData): self
     {
         $this->requestData = $requestData;
 
@@ -56,10 +56,10 @@ class ApiRequestEvent extends Event
     }
 
     /**
-     * @param string $response
+     * @param string $response|null
      * @return $this
      */
-    public function setResponse(string $response): self
+    public function setResponse(string $response = null): self
     {
         $this->response = $response;
 
@@ -80,7 +80,7 @@ class ApiRequestEvent extends Event
     /**
      * @return string
      */
-    public function getPath(): string
+    public function getPath(): ?string
     {
         return $this->path;
     }
@@ -88,7 +88,7 @@ class ApiRequestEvent extends Event
     /**
      * @return string
      */
-    public function getRequestData(): string
+    public function getRequestData(): ?string
     {
         return $this->requestData;
     }

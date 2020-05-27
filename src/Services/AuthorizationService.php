@@ -7,6 +7,8 @@ use Exception;
 /**
  * Class AuthorizationService
  * @package App\Services
+ *
+ * @author Rafał Głuszak <rafal.gluszak@gmail.com>
  */
 class AuthorizationService
 {

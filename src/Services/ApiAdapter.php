@@ -8,11 +8,15 @@ use App\Mappers\ApiResponseMapperInterface;
 use App\Type\ApiResponseType;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -78,8 +82,12 @@ class ApiAdapter
      * @param array $options
      * @param bool $log
      * @return ResponseInterface|null
+     * @throws TransportExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
      */
-    private function call(string $method, string $endpoint, array $options = null, $log = true): ?ResponseInterface
+    private function call(string $method, string $endpoint, array $options = null, $log = false): ?ResponseInterface
     {
         $apiUrl = $this->getApiUrl();
 
@@ -102,22 +110,30 @@ class ApiAdapter
                 'body' => $options
             ]);
 
-            if ($log) {
-                $apiRequestEvent = new ApiRequestEvent();
-
-                $apiRequestEvent
-                    ->setPath($endpoint)
-                    ->setRequestData(json_encode($options))
-                    ->setStatus((int) $response->getStatusCode())
-                    ->setResponse(json_encode($response->getContent()))
-                ;
-
-                $this->eventDispatcher->addListener(ApiRequestEvent::NAME, [$this->apiLogListener, 'log']);
-                $this->eventDispatcher->dispatch($apiRequestEvent, ApiRequestEvent::NAME);
+            if (!$log) {
+                return $response;
             }
 
+            $apiRequestEvent = new ApiRequestEvent();
+
+            $apiRequestEvent
+                ->setPath(urldecode($endpoint))
+                ->setStatus((int) $response->getStatusCode())
+                ->setResponse(json_encode($response->getContent()))
+                ->setRequestData(null)
+            ;
+
+            if ($method === Request::METHOD_POST) {
+                $apiRequestEvent->setRequestData(json_encode($options));
+            }
+
+            $this->eventDispatcher->addListener(ApiRequestEvent::NAME, [$this->apiLogListener, 'log']);
+            $this->eventDispatcher->dispatch($apiRequestEvent, ApiRequestEvent::NAME);
+
             return $response;
-        } catch (ExceptionInterface $error) {}
+        } catch (ClientException $error) {
+
+        }
 
         return null;
     }
@@ -159,7 +175,7 @@ class ApiAdapter
      * @param bool $log
      * @return ResponseInterface|null
      */
-    public function post(string $endpoint, array $options = null, $log = true): ?ResponseInterface
+    public function post(string $endpoint, array $options = null, $log = false): ?ResponseInterface
     {
         return $this->call(Request::METHOD_POST, $endpoint, $options, $log);
     }

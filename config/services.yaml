@@ -88,3 +88,8 @@ services:
 
   vehicle.authorization.service:
     class: App\Services\AuthorizationService
+
+  vehicle.user.service:
+    class: App\Services\UserService
+    arguments:
+      - "@vehicle.api.adapter"

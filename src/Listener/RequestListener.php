@@ -2,7 +2,7 @@
 
 namespace App\Listener;
 
-use App\Mappers\ApiAuthorizationMapper;
+use App\Mappers\ResultMapper;
 use App\Services\ApiAdapter;
 use App\Services\ApiService;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -70,8 +70,12 @@ class RequestListener
             ->checkApiAuthorization()
         ;
 
-        /** @var ApiAuthorizationMapper $apiAuthorization */
-        $apiAuthorization = $adapter->deserialize($apiAuthorization, ApiAuthorizationMapper::class);
+        if (!$apiAuthorization) {
+            return $request;
+        }
+
+        /** @var ResultMapper $apiAuthorization */
+        $apiAuthorization = $adapter->deserialize($apiAuthorization, ResultMapper::class);
 
         if (!$apiStatus || (int) $apiAuthorization->getStatus() !== Response::HTTP_OK) {
             throw new TransportException('Api is offline');

@@ -1,0 +1,7 @@
+user:
+  register:
+    form:
+      errors:
+        blank: 'This field is empty'
+        email: 'This field have to be mail address'
+        password_confirm: 'Passwords do not match'

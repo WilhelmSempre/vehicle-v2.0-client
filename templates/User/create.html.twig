@@ -1,0 +1,76 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}
+    {% trans %}user.create.title{% endtrans %} - {% trans %}application.name{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="content-header centered">
+        <h1>{% trans %}user.create.title{% endtrans %}</h1>
+    </div>
+
+    <p class="centered">{% trans %}user.create.info{% endtrans %}</p>
+
+    <section class="content">
+        <section class="card-wrapper col-md-6 col-xs-12">
+            <section class="card create-form">
+                <div class="card-body">
+                    {{ form_start(createForm, { 'attr' : { 'class': 'form create-form', 'novalidate' : 'novalidate' } }) }}
+                    {% set errorClass = '' %}
+                    <div class="form-group">
+                        {{ form_label(createForm.email) }}
+
+                        {% if createForm.email.vars.errors|length %}
+                            {% set errorClass = ' is-invalid' %}
+
+                            <div class="alert alert-danger">{{ form_errors(createForm.email) }}</div>
+                        {% endif %}
+
+                        {{ form_widget(createForm.email, { 'attr' : { 'class': 'form-control' ~ errorClass } }) }}
+
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(createForm.password.first) }}
+
+                        {% if createForm.password.first.vars.errors|length %}
+                            {% set errorClass = ' is-invalid' %}
+
+                            <div class="alert alert-danger">{{ form_errors(createForm.password.first) }}</div>
+                        {% endif %}
+
+                        {{ form_widget(createForm.password.first, { 'attr' : { 'class': 'form-control' ~ errorClass } }) }}
+
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(createForm.password.second) }}
+
+                        {% if createForm.password.second.vars.errors|length %}
+                            {% set errorClass = ' is-invalid' %}
+
+                            <div class="alert alert-danger">{{ form_errors(createForm.password.second) }}</div>
+                        {% endif %}
+
+                        {{ form_widget(createForm.password.second, { 'attr' : { 'class': 'form-control' ~ errorClass } }) }}
+
+                    </div>
+                    {{ form_widget(createForm.submit, { 'attr' : { 'class': 'btn btn-primary vehicle-gradient-button' } }) }}
+                    {{ form_end(createForm) }}
+                </div>
+            </section>
+        </section>
+
+
+        <section class="card-wrapper col-md-6 col-xs-12">
+            <section class="card create-info">
+                <div class="card-body">
+                    <h5>{% trans %}user.create.hint.header{% endtrans %}</h5>
+                    <ul class="list-unstyled">
+                        {% for hint in 'user.create.hint.content'|trans_array %}
+                            <li>{{ hint }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+        </section>
+    </section>
+{% endblock %}

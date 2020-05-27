@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
 body {
-    background-color: lightgray;
+  background-color: lightgray;
   font-family: 'Open Sans', sans-serif;
 }
 
@@ -14,12 +14,18 @@ body {
 h1, h2, h3, h4, h5 {
   font-family: 'Exo', sans-serif;
   color: $primaryColor;
+  font-weight: 700;
 }
+
+@import "modules/layout";
+@import "modules/message";
+@import "modules/notifications";
+@import "modules/offline";
+@import "modules/form";
 
 @import "partials/header";
 @import "partials/sidebar";
 @import "partials/footer";
 
-@import "modules/message";
-@import "modules/notifications";
-@import "modules/offline";
+
+@import "partials/User/create";

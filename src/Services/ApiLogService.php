@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 /**
  * Class ApiLogService
  * @package App\Services
+ *
+ * @author Rafał Głuszak <rafal.gluszak@gmail.com>
  */
 class ApiLogService
 {

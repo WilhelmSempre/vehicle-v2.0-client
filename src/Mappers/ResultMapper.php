@@ -9,12 +9,12 @@ use JMS\Serializer\Annotation\AccessType;
 /**
  * @AccessType("public_method")
  *
- * Class ApiAuthorizationMapper
+ * Class ResultMapper
  * @package App\Mappers
  *
  * @author Rafał Głuszak <rafal.gluszak@gmail.com>
  */
-class ApiAuthorizationMapper implements ApiResponseMapperInterface
+class ResultMapper implements ApiResponseMapperInterface
 {
 
     /**
@@ -23,7 +23,7 @@ class ApiAuthorizationMapper implements ApiResponseMapperInterface
      *
      * @var string|null
      */
-    private $status;
+    private ?string $status;
 
     /**
      * @Serializer\Type("string")
@@ -31,11 +31,11 @@ class ApiAuthorizationMapper implements ApiResponseMapperInterface
      *
      * @var string|null
      */
-    private $message;
+    private ?string $message;
 
     /**
      * @param string $status
-     * @return ApiAuthorizationMapper
+     * @return ResultMapper
      */
     public function setStatus(string $status): self
     {
@@ -46,7 +46,7 @@ class ApiAuthorizationMapper implements ApiResponseMapperInterface
 
     /**
      * @param string $message
-     * @return ApiAuthorizationMapper
+     * @return ResultMapper
      */
     public function setMessage(string $message): self
     {

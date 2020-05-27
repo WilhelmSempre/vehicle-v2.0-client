@@ -2,7 +2,7 @@
 
 namespace App\DataCollector;
 
-use App\Mappers\ApiAuthorizationMapper;
+use App\Mappers\ResultMapper;
 use App\Services\ApiAdapter;
 use App\Services\ApiLogService;
 use App\Services\ApiService;
@@ -69,6 +69,11 @@ class ApiLogCollector extends DataCollector
         $this->data['log'] = [];
 
         $apiLogFile = trim(file_get_contents($apiLogFile));
+
+        if (!$apiLogFile) {
+            return;
+        }
+
         $apiLogFileLines = explode("\n", $apiLogFile);
         $apiLogFileLines = array_reverse($apiLogFileLines);
 
