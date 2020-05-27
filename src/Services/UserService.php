@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -22,12 +23,19 @@ class UserService
     private ApiAdapter $adapter;
 
     /**
+     * @var UserPasswordEncoderInterface
+     */
+    private UserPasswordEncoderInterface $passwordEncoder;
+
+    /**
      * UserService constructor.
      * @param ApiAdapter $adapter
+     * @param UserPasswordEncoderInterface $passwordEncoder
      */
-    public function __construct(ApiAdapter $adapter)
+    public function __construct(ApiAdapter $adapter, UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->adapter = $adapter;
+        $this->passwordEncoder = $passwordEncoder;
     }
 
     /**
@@ -38,7 +46,7 @@ class UserService
     {
         $options = [
             'email' => $user->getEmail(),
-            'password' => sha1($user->getPassword()),
+            'password' => $this->passwordEncoder->encodePassword($user, $user->getPassword()),
         ];
 
         return $this->adapter
@@ -52,6 +60,15 @@ class UserService
      */
     public function isUser(User $user): bool
     {
+        return $this->getUserByEmail($user) instanceof User;
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function getUserByEmail(User $user)
+    {
         $options = [
             '{email}' => urlencode($user->getEmail()),
         ];
@@ -59,6 +76,28 @@ class UserService
         /** @var ResponseInterface $response */
         $response = $this->adapter
             ->get('user/get/email/{email}', $options, true)
+        ;
+
+        try {
+            if ($response && $response->getStatusCode() === Response::HTTP_OK) {
+                return $this->adapter
+                    ->deserialize($response->getContent(), User::class);
+            }
+        } catch (TransportExceptionInterface $error) {
+            return false;
+        }
+    }
+
+    /**
+     * @param array $credentials
+     * @return bool
+     */
+    public function loginUser(array $credentials): bool
+    {
+
+        /** @var ResponseInterface $response */
+        $response = $this->adapter
+            ->post('user/login', $credentials, true)
         ;
 
         try {

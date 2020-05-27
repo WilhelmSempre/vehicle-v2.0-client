@@ -93,3 +93,9 @@ services:
     class: App\Services\UserService
     arguments:
       - "@vehicle.api.adapter"
+      - "@security.password_encoder"
+
+  vehicle.user.provider:
+    class: App\Security\UserProvider
+    arguments:
+      - "@vehicle.user.service"

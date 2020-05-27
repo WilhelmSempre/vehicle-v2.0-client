@@ -24,3 +24,11 @@ user:
       success: 'New user created successfully'
       error: 'Something went wrong. Call to office for feedback'
       user_exists: 'User already exists in system!'
+
+  login:
+    message: 'Sign in to start your session'
+
+    form:
+      email: 'Email address:'
+      password: 'Password:'
+      submit: 'Login'
